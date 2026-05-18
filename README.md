@@ -21,6 +21,8 @@ This project is a skeleton designed for students to practice:
 Requirement: Java 17+ and Maven installed.
 
 ```bash
+mvn compile
+mvn clean install
 mvn clean javafx:run
 ```
 
