@@ -6,6 +6,8 @@ import java.util.List;
 public interface ExhibitionDao {
     List<Exhibition> findAll();
 
+    List<Exhibition> findByGalleryName(String galleryName);
+
     void save(Exhibition exhibition);
 
     void update(Exhibition exhibition);
