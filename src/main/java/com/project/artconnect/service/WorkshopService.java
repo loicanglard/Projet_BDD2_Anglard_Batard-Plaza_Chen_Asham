@@ -8,10 +8,10 @@ import java.util.Optional;
 
 public interface WorkshopService {
     List<Workshop> getAllWorkshops();
-
     Optional<Workshop> getWorkshopByTitle(String title);
-
     void bookWorkshop(Workshop workshop, CommunityMember member);
-
     List<Booking> getBookingsByMember(CommunityMember member);
+    void createWorkshop(Workshop workshop);
+    void updateWorkshop(Workshop workshop);
+    void deleteWorkshop(String title);
 }

@@ -7,8 +7,9 @@ import java.util.Optional;
 
 public interface CommunityService {
     List<CommunityMember> getAllMembers();
-
     Optional<CommunityMember> getMemberByName(String name);
-
     List<Review> getReviewsByMember(CommunityMember member);
+    void createMember(CommunityMember member);
+    void updateMember(CommunityMember member);
+    void deleteMember(String name);
 }

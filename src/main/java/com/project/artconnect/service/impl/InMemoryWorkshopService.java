@@ -60,4 +60,11 @@ public class InMemoryWorkshopService implements WorkshopService {
             return Collections.emptyList();
         return member.getBookings();
     }
+
+    @Override
+    public void createWorkshop(com.project.artconnect.model.Workshop w) { /* stub */ }
+    @Override
+    public void updateWorkshop(com.project.artconnect.model.Workshop w) { /* stub */ }
+    @Override
+    public void deleteWorkshop(String title) { /* stub */ }
 }

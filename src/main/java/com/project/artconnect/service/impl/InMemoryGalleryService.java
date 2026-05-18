@@ -69,4 +69,11 @@ public class InMemoryGalleryService implements GalleryService {
             return Collections.emptyList();
         return gallery.getExhibitions();
     }
+
+    @Override
+    public void createGallery(com.project.artconnect.model.Gallery gallery) { /* stub */ }
+    @Override
+    public void updateGallery(com.project.artconnect.model.Gallery gallery) { /* stub */ }
+    @Override
+    public void deleteGallery(String name) { /* stub */ }
 }

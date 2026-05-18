@@ -54,4 +54,11 @@ public class InMemoryCommunityService implements CommunityService {
             return Collections.emptyList();
         return member.getReviews();
     }
+
+    @Override
+    public void createMember(com.project.artconnect.model.CommunityMember m) { /* stub */ }
+    @Override
+    public void updateMember(com.project.artconnect.model.CommunityMember m) { /* stub */ }
+    @Override
+    public void deleteMember(String name) { /* stub */ }
 }

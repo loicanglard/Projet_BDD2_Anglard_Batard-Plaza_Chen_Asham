@@ -24,16 +24,27 @@ public class JdbcCommunityService implements CommunityService {
 
     @Override
     public Optional<CommunityMember> getMemberByName(String name) {
-        return memberDao.findAll().stream()
-                .filter(m -> m.getName().equals(name))
-                .findFirst();
+        return memberDao.findAll().stream().filter(m -> m.getName().equals(name)).findFirst();
     }
 
     @Override
     public List<Review> getReviewsByMember(CommunityMember member) {
-        if (member == null) {
-            return Collections.emptyList();
-        }
+        if (member == null) return Collections.emptyList();
         return member.getReviews();
+    }
+
+    @Override
+    public void createMember(CommunityMember member) {
+        memberDao.save(member);
+    }
+
+    @Override
+    public void updateMember(CommunityMember member) {
+        memberDao.update(member);
+    }
+
+    @Override
+    public void deleteMember(String name) {
+        memberDao.delete(name);
     }
 }

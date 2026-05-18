@@ -1,18 +1,12 @@
 package com.project.artconnect.service.impl;
 
 import com.project.artconnect.dao.WorkshopDao;
-import com.project.artconnect.model.Artist;
-import com.project.artconnect.model.Booking;
-import com.project.artconnect.model.CommunityMember;
-import com.project.artconnect.model.Workshop;
+import com.project.artconnect.model.*;
 import com.project.artconnect.service.WorkshopService;
 import com.project.artconnect.util.ConnectionManager;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class JdbcWorkshopService implements WorkshopService {
 
@@ -29,19 +23,30 @@ public class JdbcWorkshopService implements WorkshopService {
 
     @Override
     public Optional<Workshop> getWorkshopByTitle(String title) {
-        return workshopDao.findAll().stream()
-                .filter(w -> w.getTitle().equals(title))
-                .findFirst();
+        return workshopDao.findAll().stream().filter(w -> w.getTitle().equals(title)).findFirst();
+    }
+
+    @Override
+    public void createWorkshop(Workshop workshop) {
+        workshopDao.save(workshop);
+    }
+
+    @Override
+    public void updateWorkshop(Workshop workshop) {
+        workshopDao.update(workshop);
+    }
+
+    @Override
+    public void deleteWorkshop(String title) {
+        workshopDao.delete(title);
     }
 
     @Override
     public void bookWorkshop(Workshop workshop, CommunityMember member) {
         if (workshop == null || member == null) return;
-
         String sqlMemberId   = "SELECT Member_id FROM Member_ WHERE Member_name=?";
         String sqlWorkshopId = "SELECT Workshop_id FROM Workshop WHERE Workshop_Title=?";
         String sqlInsert     = "INSERT IGNORE INTO Participates(Member_id, Workshop_id) VALUES (?, ?)";
-
         try (Connection conn = ConnectionManager.getConnection()) {
             int memberId;
             try (PreparedStatement ps = conn.prepareStatement(sqlMemberId)) {
@@ -51,7 +56,6 @@ public class JdbcWorkshopService implements WorkshopService {
                     memberId = rs.getInt(1);
                 }
             }
-
             int workshopId;
             try (PreparedStatement ps = conn.prepareStatement(sqlWorkshopId)) {
                 ps.setString(1, workshop.getTitle());
@@ -60,16 +64,12 @@ public class JdbcWorkshopService implements WorkshopService {
                     workshopId = rs.getInt(1);
                 }
             }
-
             try (PreparedStatement ps = conn.prepareStatement(sqlInsert)) {
                 ps.setInt(1, memberId);
                 ps.setInt(2, workshopId);
                 ps.executeUpdate();
             }
-
-            Booking booking = new Booking(workshop, member);
-            member.addBooking(booking);
-
+            member.addBooking(new Booking(workshop, member));
         } catch (SQLException e) {
             throw new RuntimeException("bookWorkshop failed", e);
         }
@@ -78,16 +78,12 @@ public class JdbcWorkshopService implements WorkshopService {
     @Override
     public List<Booking> getBookingsByMember(CommunityMember member) {
         if (member == null) return Collections.emptyList();
-
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT w.Workshop_Title, w.Workshop_Date, w.Workshop_Price, w.Workshop_Level, " +
                      "a.Artist_name, a.Artist_email, a.Artist_city, a.Artist_Birth_Year, a.Artist_Discipline " +
-                     "FROM Participates p " +
-                     "JOIN Member_ m ON p.Member_id = m.Member_id " +
+                     "FROM Participates p JOIN Member_ m ON p.Member_id = m.Member_id " +
                      "JOIN Workshop w ON p.Workshop_id = w.Workshop_id " +
-                     "JOIN Artist a ON w.Artist_id = a.Artist_id " +
-                     "WHERE m.Member_name=?";
-
+                     "JOIN Artist a ON w.Artist_id = a.Artist_id WHERE m.Member_name=?";
         try (Connection conn = ConnectionManager.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, member.getName());
@@ -99,13 +95,9 @@ public class JdbcWorkshopService implements WorkshopService {
                     if (ts != null) w.setDate(ts.toLocalDateTime());
                     w.setPrice(rs.getDouble("Workshop_Price"));
                     w.setLevel(rs.getString("Workshop_Level"));
-
                     Artist instructor = new Artist();
                     instructor.setName(rs.getString("Artist_name"));
-                    instructor.setContactEmail(rs.getString("Artist_email"));
-                    instructor.setCity(rs.getString("Artist_city"));
                     w.setInstructor(instructor);
-
                     bookings.add(new Booking(w, member));
                 }
             }

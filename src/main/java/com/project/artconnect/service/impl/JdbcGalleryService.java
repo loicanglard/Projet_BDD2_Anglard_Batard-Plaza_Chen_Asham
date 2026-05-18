@@ -24,9 +24,7 @@ public class JdbcGalleryService implements GalleryService {
         List<Gallery> galleries = galleryDao.findAll();
         for (Gallery gallery : galleries) {
             List<Exhibition> exhibitions = exhibitionDao.findByGalleryName(gallery.getName());
-            for (Exhibition exhibition : exhibitions) {
-                exhibition.setGallery(gallery);
-            }
+            for (Exhibition exhibition : exhibitions) exhibition.setGallery(gallery);
             gallery.setExhibitions(exhibitions);
         }
         return galleries;
@@ -34,16 +32,27 @@ public class JdbcGalleryService implements GalleryService {
 
     @Override
     public Optional<Gallery> getGalleryByName(String name) {
-        return getAllGalleries().stream()
-                .filter(g -> g.getName().equals(name))
-                .findFirst();
+        return getAllGalleries().stream().filter(g -> g.getName().equals(name)).findFirst();
     }
 
     @Override
     public List<Exhibition> getExhibitionsByGallery(Gallery gallery) {
-        if (gallery == null) {
-            return List.of();
-        }
+        if (gallery == null) return List.of();
         return exhibitionDao.findByGalleryName(gallery.getName());
+    }
+
+    @Override
+    public void createGallery(Gallery gallery) {
+        galleryDao.save(gallery);
+    }
+
+    @Override
+    public void updateGallery(Gallery gallery) {
+        galleryDao.update(gallery);
+    }
+
+    @Override
+    public void deleteGallery(String name) {
+        galleryDao.delete(name);
     }
 }
